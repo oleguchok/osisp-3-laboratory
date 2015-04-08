@@ -42,10 +42,6 @@
 	while(cur_num_proc != 0)
 	{
 		ret = wait(NULL);
-		/*if (ret=wait(NULL) == -1)
-		{
-			//fprintf(stderr, "%d %s : %s\n", getpid(), execfile, strerror(errno));
-		}*/
 		cur_num_proc--;
 	}
 
@@ -83,26 +79,19 @@
  		fprintf(stderr, "%d : %s : %s :%s\n", getpid(), execfile, strerror(errno), filepath);
  		return 1;
  	}
- 	while (1)
- 	{
- 		int letterflag = 1;
- 		c = fgetc(file);
- 		
- 		if (feof(file))
- 			break;
-
- 		readingbytes++;
-
- 		if (isitletter(c) == 1)
- 			letterflag = 1;
- 		if (isitletter(c) == 0)
- 			if (letterflag == 1)
- 			{
- 				countofwords++;
- 				letterflag = 0;
- 			}
-
- 	}
+ 	do
+	{
+		c=fgetc(file);
+		readingbytes++;
+		if (c!='\n' && c!=' ' && c!=EOF && c!='\t')
+		{
+			c = fgetc(file);
+			countofwords++;
+			while (c!='\n'&& c!=' ' && c!=EOF && c!='\t')
+				c=fgetc(file);
+		}
+	}
+	while (c!=EOF);
  	if (fclose(file) == EOF)
  		fprintf(stderr, "%d : %s : %s : %s\n", getpid(), execfile, strerror(errno), filepath);
 
@@ -174,7 +163,10 @@
  		free(filepath);
  	}
  	if (errno != temperror)
+ 	{
  		fprintf(stderr, "%d %s : %s\n", getpid(), execfile, strerror(errno));
+ 		return 1;
+ 	}
  	if (closedir(dfd) != 0)
  	{
  		fprintf(stderr, "%d %s : %s\n", getpid(), execfile, strerror(errno));
