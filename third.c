@@ -25,8 +25,7 @@
  char* getfullname(char*,char*);
  int getprocess(char*);
  int getcountofwords(char*);
- int isitletter(char);
-
+ 
  int main(int argc, char* argv[])
  {
  	int ret;
@@ -58,14 +57,6 @@
  	return filepath;
  } 
 
- int isitletter(char symbol)
- {
- 	if ((('A' <= symbol) && ('Z' >= symbol)) || (('a' <= symbol) && ('z' >= symbol)))
- 		return 1;
- 	else
- 		return 0;
- }
-
  int getcountofwords(char* filepath)
  {
  	FILE* file;
@@ -86,9 +77,13 @@
 		if (c!='\n' && c!=' ' && c!=EOF && c!='\t')
 		{
 			c = fgetc(file);
+			readingbytes++;
 			countofwords++;
 			while (c!='\n'&& c!=' ' && c!=EOF && c!='\t')
+			{
 				c=fgetc(file);
+				readingbytes++;
+			}
 		}
 	}
 	while (c!=EOF);
@@ -159,10 +154,10 @@
 		else if (dir->d_type == DT_REG)
  			getprocess(filepath);
  	
- 		temperror = errno;
+ 		
  		free(filepath);
  	}
- 	if (errno != temperror)
+ 	if (errno == EBADF)
  	{
  		fprintf(stderr, "%d %s : %s\n", getpid(), execfile, strerror(errno));
  		return 1;
